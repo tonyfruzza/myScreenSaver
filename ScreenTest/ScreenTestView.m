@@ -8,11 +8,12 @@
 
 #import "ScreenTestView.h"
 
-#define SPRITE_WIDTH  16
-#define SPRITE_HEIGHT 16
-#define H_PIXEL_RATIO 180
-#define V_PIXEL_RATIO 100
-#define COLOR_TRANSPARENT 7
+#define SPRITE_WIDTH       16
+#define SPRITE_HEIGHT      16
+#define H_PIXEL_RATIO_TO_V 1.8
+#define H_PIXEL_SIZE_MIN   20
+#define H_PIXEL_SIZE_MAX   200
+
 
 
 @implementation ScreenTestView
@@ -47,7 +48,7 @@ float offset_x, offset_y;
     NSRect rect;
     NSSize size;
     NSColor *color;
-    unsigned int indexColor, imagePicker;
+    unsigned int indexColor, imagePicker, h_pixel_size, v_pixel_size;
     
     CGFloat alphaVal  = 1;
     // Similar to Commodore 64 colormap with 16 designated as transparent
@@ -158,7 +159,7 @@ float offset_x, offset_y;
                           ];
     
     
-    // Open eyed bitmap
+    // Sprite bitmaps
     const unsigned char icon_head[SPRITE_WIDTH*SPRITE_HEIGHT] =
     {
         16,16,16,16,16,16,4,4,4,4,16,16,16,16,16,16,
@@ -178,8 +179,7 @@ float offset_x, offset_y;
         16,16,16,16,16,16,4,4,4,4,16,16,16,16,16,16,
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
     };
-    
-    // Close eyed bitmap
+
     const unsigned char icon_head_blink[SPRITE_WIDTH*SPRITE_HEIGHT] =
     {
         16,16,16,16,16,16,4,4,4,4,16,16,16,16,16,16,
@@ -200,7 +200,6 @@ float offset_x, offset_y;
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
     };
     
-    // Alarm clock
     const unsigned char icon_alarm_clock[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,16,12,16,2,2,2,2,2,2,16,12,16,16,16,
         16,16,16,16,2,2,1,0,1,15,2,2,16,16,16,16,
@@ -239,7 +238,6 @@ float offset_x, offset_y;
         16,16,16,16,0,0,0,0,0,0,0,0,0,16,16,16
     };
     
-    // hour glass
     const unsigned char icon_hour_glass[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,5,5,5,2,5,5,5,5,5,5,5,16,16,16,
         16,16,5,6,2,5,5,5,5,5,5,5,5,16,16,16,
@@ -259,7 +257,6 @@ float offset_x, offset_y;
         16,16,5,6,2,5,5,5,5,5,5,5,5,16,16,16
     };
     
-    // pager duty green
     const unsigned char icon_pager_duty_green[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,16,16,0,0,0,0,0,0,0,0,0,16,16,16,
         16,16,16,0,12,7,7,7,7,7,7,7,7,0,16,16,
@@ -279,7 +276,6 @@ float offset_x, offset_y;
         16,16,16,16,0,0,0,0,0,0,0,0,0,16,16,16
     };
     
-    //sql
     const unsigned char icon_sql[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
         16,16,16,16,16,16,3,3,14,14,14,16,16,16,16,16,
@@ -299,7 +295,6 @@ float offset_x, offset_y;
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
     };
     
-    // trash
     const unsigned char icon_trash[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
         16,16,16,0,0,0,7,0,0,0,0,0,0,16,16,16,
@@ -319,7 +314,6 @@ float offset_x, offset_y;
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
     };
     
-    // bell
     const unsigned char icon_bell[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,16,16,16,11,11,5,16,16,16,16,16,16,16,16,
         16,16,16,16,16,11,11,11,7,5,11,11,16,16,16,16,
@@ -339,7 +333,6 @@ float offset_x, offset_y;
         11,11,16,16,16,16,16,16,16,16,16,16,16,16,16,16
     };
     
-    // construction
     const unsigned char icon_construction[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
         2,11,11,11,11,11,11,11,11,11,11,11,11,11,11,2,
@@ -359,7 +352,6 @@ float offset_x, offset_y;
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
     };
     
-    // hammer
     const unsigned char icon_hammer[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
@@ -379,7 +371,6 @@ float offset_x, offset_y;
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
     };
     
-    // key
     const unsigned char icon_key[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         5,5,5,16,16,16,16,16,16,16,16,16,16,16,16,16,
         5,11,5,16,16,16,16,16,16,16,16,16,16,16,16,16,
@@ -399,7 +390,6 @@ float offset_x, offset_y;
         16,16,16,16,16,16,16,16,16,16,5,5,5,16,16,16
     };
     
-    // screen
     const unsigned char icon_screen[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
         16,16,16,16,7,7,7,7,7,7,7,7,16,16,16,16,
@@ -419,7 +409,6 @@ float offset_x, offset_y;
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
     };
     
-    // tag
     const unsigned char icon_tag[SPRITE_WIDTH*SPRITE_HEIGHT] = {
         16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
         16,16,16,16,16,16,8,8,16,16,16,16,16,16,16,16,
@@ -471,21 +460,25 @@ float offset_x, offset_y;
     [color set];
     [path fill];
     
+    // Choose the size of the image
+    v_pixel_size = SSRandomIntBetween(H_PIXEL_SIZE_MIN, H_PIXEL_SIZE_MAX);
+    h_pixel_size = v_pixel_size * H_PIXEL_RATIO_TO_V;
+    
     // Set pixel size/aspect ratio
-    rect.size = NSMakeSize(size.width/H_PIXEL_RATIO, size.height/V_PIXEL_RATIO);
+    rect.size = NSMakeSize(size.width/h_pixel_size, size.height/v_pixel_size);
 
     // random location
-    offset_x = (size.width/H_PIXEL_RATIO)  * SSRandomIntBetween( 0, H_PIXEL_RATIO - SPRITE_WIDTH );
-    offset_y = (size.height/V_PIXEL_RATIO) * SSRandomIntBetween( 0, V_PIXEL_RATIO - SPRITE_HEIGHT );
+    offset_x = (size.width/h_pixel_size)  * SSRandomIntBetween( 0, h_pixel_size - SPRITE_WIDTH );
+    offset_y = (size.height/v_pixel_size) * SSRandomIntBetween( 0, v_pixel_size - SPRITE_HEIGHT );
     
     // Image to draw
     imagePicker = SSRandomIntBetween(0, 13);
     
     // Draw from the chosen image with transparency being COLOR_TRANSPARENT
     for(int y = SPRITE_HEIGHT-1; y > -1; y--){
-        rect.origin.y = ((size.height/V_PIXEL_RATIO) * y) + offset_y;
+        rect.origin.y = ((size.height/v_pixel_size) * y) + offset_y;
         for(int x = 0; x < SPRITE_WIDTH; x++){
-            rect.origin.x = ((size.width/H_PIXEL_RATIO) * x) + offset_x;
+            rect.origin.x = ((size.width/h_pixel_size) * x) + offset_x;
             path  = [NSBezierPath bezierPathWithRect:rect];
             indexColor = image_collection[imagePicker][(y * SPRITE_WIDTH) + x];
             color = colorMap[indexColor];
