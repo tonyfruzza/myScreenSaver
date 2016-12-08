@@ -17,13 +17,16 @@
 
 
 @implementation ScreenTestView
-float offset_x, offset_y;
+
+BOOL faces_only = false;
+
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
 {
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) {
         [self setAnimationTimeInterval:1/2.0];
     }
+    faces_only = SSRandomIntBetween(0, 1) == 0;
     return self;
 }
 
@@ -49,6 +52,7 @@ float offset_x, offset_y;
     NSSize size;
     NSColor *color;
     unsigned int indexColor, imagePicker, h_pixel_size, v_pixel_size;
+    float offset_x, offset_y;
     
     CGFloat alphaVal  = 1;
     // Similar to Commodore 64 colormap with 16 designated as transparent
@@ -429,8 +433,8 @@ float offset_x, offset_y;
     };
     
     const unsigned char *image_collection[] = {
-        icon_alarm_clock,
         icon_head,
+        icon_alarm_clock,
         icon_head_blink,
         icon_cell_phone,
         icon_hour_glass,
@@ -472,7 +476,7 @@ float offset_x, offset_y;
     offset_y = (size.height/v_pixel_size) * SSRandomIntBetween( 0, v_pixel_size - SPRITE_HEIGHT );
     
     // Image to draw
-    imagePicker = SSRandomIntBetween(0, 13);
+    imagePicker = faces_only? 0 : SSRandomIntBetween(0, 13);
     
     // Draw from the chosen image with transparency being COLOR_TRANSPARENT
     for(int y = SPRITE_HEIGHT-1; y > -1; y--){
